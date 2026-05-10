@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pl" class="scroll-smooth">
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,12 +15,20 @@
         /* Styl dla customowych pasków postępu TOPR */
         .progress-bar-bg { background-color: #334155; height: 8px; border-radius: 4px; overflow: hidden; }
         .progress-bar-fill { height: 100%; transition: width 1s ease-in-out; }
+        
+        /* Klasy pomocnicze dla zakładek */
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-300 antialiased selection:bg-emerald-500/30">
 
     <!-- Hero Section -->
-    <header class="relative bg-slate-950 pt-20 pb-16 px-6 border-b border-slate-800 text-center overflow-hidden">
+    <header class="relative bg-slate-950 pt-16 pb-12 px-6 border-b border-slate-800 text-center overflow-hidden">
         <!-- Tło z subtelną siatką -->
         <div class="absolute inset-0 opacity-10 pointer-events-none">
             <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
@@ -34,33 +42,45 @@
         </div>
 
         <div class="relative max-w-5xl mx-auto z-10">
-            <div class="inline-flex items-center p-2 bg-emerald-500/10 text-emerald-400 rounded-full mb-6 ring-1 ring-emerald-500/20 text-xs uppercase tracking-widest font-bold">
+            <div class="inline-flex items-center p-2 bg-emerald-500/10 text-emerald-400 rounded-full mb-4 ring-1 ring-emerald-500/20 text-xs uppercase tracking-widest font-bold">
                 <i data-lucide="mountain" class="w-4 h-4 mr-2"></i> Operacja: Sierpień 2026
             </div>
-            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight">Projekt <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Rysy</span></h1>
-            <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
-                Ekspercki raport analityczny: Uwarunkowania techniczne, profilaktyka zagrożeń oraz metodyka przygotowań do letniej eksploracji szczytu Rysy (2499 m n.p.m.) w warunkach wzmożonego ruchu turystycznego.
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-4 tracking-tight">Projekt <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Rysy</span></h1>
+            <p class="text-base md:text-lg text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
+                Ekspercki raport analityczny: Uwarunkowania techniczne, profilaktyka zagrożeń oraz metodyka przygotowań do letniej eksploracji szczytu Rysy (2499 m n.p.m.).
             </p>
         </div>
     </header>
 
-    <!-- Nawigacja -->
+    <!-- Nawigacja (Zakładki) -->
     <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4">
-        <div class="max-w-5xl mx-auto flex overflow-x-auto hide-scrollbar text-sm md:text-base">
-            <a href="#wprowadzenie" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="info" class="w-4 h-4 mr-2"></i> Kontekst</a>
-            <a href="#trasa" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="map" class="w-4 h-4 mr-2"></i> Trasa</a>
-            <a href="#zagrozenia" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> Zagrożenia</a>
-            <a href="#trening" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="dumbbell" class="w-4 h-4 mr-2"></i> Trening</a>
-            <a href="#ekwipunek" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="backpack" class="w-4 h-4 mr-2"></i> Ekwipunek</a>
-            <a href="#harmonogram" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="clock" class="w-4 h-4 mr-2"></i> Harmonogram</a>
+        <div class="max-w-5xl mx-auto flex overflow-x-auto hide-scrollbar text-sm md:text-base" id="tabs-nav">
+            <button data-target="wprowadzenie" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-emerald-400 transition-colors border-b-2 border-emerald-400 active">
+                <i data-lucide="info" class="w-4 h-4 mr-2"></i> Kontekst
+            </button>
+            <button data-target="trasa" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent">
+                <i data-lucide="map" class="w-4 h-4 mr-2"></i> Trasa
+            </button>
+            <button data-target="zagrozenia" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent">
+                <i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> Zagrożenia
+            </button>
+            <button data-target="trening" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent">
+                <i data-lucide="dumbbell" class="w-4 h-4 mr-2"></i> Trening
+            </button>
+            <button data-target="ekwipunek" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent">
+                <i data-lucide="backpack" class="w-4 h-4 mr-2"></i> Ekwipunek
+            </button>
+            <button data-target="harmonogram" class="tab-btn flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-slate-200 transition-colors border-b-2 border-transparent">
+                <i data-lucide="clock" class="w-4 h-4 mr-2"></i> Harmonogram
+            </button>
         </div>
     </nav>
 
     <!-- Główna zawartość -->
-    <main class="max-w-5xl mx-auto p-6 py-12 space-y-24">
+    <main class="max-w-5xl mx-auto p-6 py-12 min-h-[60vh]">
         
         <!-- SEKCJA: Wprowadzenie -->
-        <section id="wprowadzenie" class="scroll-mt-24">
+        <section id="wprowadzenie" class="tab-content active">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-emerald-500/10 rounded-lg"><i data-lucide="info" class="w-6 h-6 text-emerald-400"></i></div>
                 <h2 class="text-3xl font-bold text-white">Wprowadzenie i Kontekst Topograficzny</h2>
@@ -84,7 +104,7 @@
         </section>
 
         <!-- SEKCJA: Trasa -->
-        <section id="trasa" class="scroll-mt-24">
+        <section id="trasa" class="tab-content">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-blue-500/10 rounded-lg"><i data-lucide="map" class="w-6 h-6 text-blue-400"></i></div>
                 <h2 class="text-3xl font-bold text-white">Analiza Odcinków Trasy</h2>
@@ -128,7 +148,7 @@
         </section>
 
         <!-- SEKCJA: Zagrożenia -->
-        <section id="zagrozenia" class="scroll-mt-24">
+        <section id="zagrozenia" class="tab-content">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-red-500/10 rounded-lg"><i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i></div>
                 <h2 class="text-3xl font-bold text-white">Zagrożenia i Statystyki TOPR</h2>
@@ -194,7 +214,7 @@
         </section>
 
         <!-- SEKCJA: Trening -->
-        <section id="trening" class="scroll-mt-24">
+        <section id="trening" class="tab-content">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-emerald-500/10 rounded-lg"><i data-lucide="dumbbell" class="w-6 h-6 text-emerald-400"></i></div>
                 <h2 class="text-3xl font-bold text-white">8-Tygodniowa Metodyka Przygotowań</h2>
@@ -251,7 +271,7 @@
         </section>
 
         <!-- SEKCJA: Ekwipunek -->
-        <section id="ekwipunek" class="scroll-mt-24">
+        <section id="ekwipunek" class="tab-content">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-indigo-500/10 rounded-lg"><i data-lucide="backpack" class="w-6 h-6 text-indigo-400"></i></div>
                 <h2 class="text-3xl font-bold text-white">Checklista Wyposażenia Operacyjnego</h2>
@@ -273,7 +293,7 @@
         </section>
 
         <!-- SEKCJA: Harmonogram -->
-        <section id="harmonogram" class="scroll-mt-24 pb-12">
+        <section id="harmonogram" class="tab-content">
             <div class="flex items-center gap-3 mb-8">
                 <div class="p-3 bg-cyan-500/10 rounded-lg"><i data-lucide="clock" class="w-6 h-6 text-cyan-400"></i></div>
                 <h2 class="text-3xl font-bold text-white">Taktyczny Harmonogram Ataku Szczytowego</h2>
@@ -377,14 +397,43 @@
         Panel operacyjny zaprojektowany na podstawie założeń eksperckich.
     </footer>
 
-    <!-- Logika Checklisty -->
+    <!-- Logika Zakładek i Checklisty -->
     <script>
         lucide.createIcons();
 
+        // --- Logika Zakładek (Tabs) ---
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Usuń aktywne klasy ze wszystkich przycisków
+                tabBtns.forEach(b => {
+                    b.classList.remove('text-emerald-400', 'border-emerald-400', 'active');
+                    b.classList.add('text-slate-400', 'border-transparent');
+                });
+                
+                // Ukryj całą zawartość
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+
+                // Dodaj aktywne klasy do klikniętego przycisku
+                btn.classList.add('text-emerald-400', 'border-emerald-400', 'active');
+                btn.classList.remove('text-slate-400', 'border-transparent');
+
+                // Pokaż odpowiednią zawartość
+                const targetId = btn.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // --- Logika Checklisty ---
         const eqItems = [
             { id: 'kask', title: 'Kask Wspinaczkowy (UIAA)', desc: 'Chroni głowę przed kamieniami zrzucanymi z góry przez innych. Bezwzględny obowiązek.', critical: true },
             { id: 'buty', title: 'Buty Podejściowe (Vibram)', desc: 'Półsztywne, z trefą "climbing zone" na przodzie. Zwykłe adidasy to ryzyko utraty życia na wilgotnych, śliskich płytach.', critical: true },
             { id: 'woda', title: 'Nawodnienie (3-4 litry/os.)', desc: 'Woda, izotoniki, elektrolity. Wyżej nie ma dostępu do strumieni, a odwodnienie niszczy koncentrację.', critical: true },
+            { id: 'jedzenie', title: 'Prowiant Wysokoenergetyczny', desc: 'Węgle złożone (kanapki pełnoziarniste na postój) i szybkie cukry (żele, batony, czekolada) do jedzenia w marszu.', critical: true },
             { id: 'rekawice', title: 'Rękawice (Ferratowe/Rowerowe)', desc: 'Stalowe łańcuchy niszczą dłonie, powodują pęcherze i ból po 2 godzinach wciągania się.', critical: false },
             { id: 'hardshell', title: 'Odzież Membranowa & Merino', desc: 'Zero bawełny! Ochrona przed lodowatym wiatrem na grani w trakcie zatorów (oczekiwania w miejscu).', critical: false },
             { id: 'raczki', title: 'Raczki Turystyczne', desc: 'Narzędzie awaryjne. Niezbędne do przejścia zlodowaciałego żlebu (Rysy) pod Bulą z samego rana.', critical: false },
