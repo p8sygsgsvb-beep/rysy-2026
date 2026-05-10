@@ -638,21 +638,6 @@ Bądź pomocny, profesjonalny i dbaj o ich bezpieczeństwo. Mów w języku polsk
             if (el) el.remove();
         }
 
-        async function fetchWithBackoff(url, options, retries = 5) {
-            let delay = 1000;
-            for (let i = 0; i < retries; i++) {
-                try {
-                    const res = await fetch(url, options);
-                    if (!res.ok) throw new Error(`Błąd HTTP: ${res.status}`);
-                    return await res.json();
-                } catch (e) {
-                    if (i === retries - 1) throw e;
-                    await new Promise(resolve => setTimeout(resolve, delay));
-                    delay *= 2;
-                }
-            }
-        }
-
         async function sendMessage() {
             const text = inputField.value.trim();
             if (!text) return;
@@ -675,13 +660,20 @@ Bądź pomocny, profesjonalny i dbaj o ich bezpieczeństwo. Mów w języku polsk
                     systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
                 };
 
-                const data = await fetchWithBackoff(url, {
+                const res = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
                 });
 
+                const data = await res.json();
                 removeTypingIndicator();
+
+                if (!res.ok) {
+                    console.error("Błąd API:", data);
+                    appendMessage(`⚠️ Serwer odrzucił połączenie: ${data.error?.message || 'Nieznany błąd'}. Upewnij się, że klucz API został skopiowany w CAŁOŚCI przyciskiem 'Copy' (powinien mieć 39 znaków).`, false);
+                    return;
+                }
 
                 const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
                 if (aiResponse) {
@@ -693,7 +685,7 @@ Bądź pomocny, profesjonalny i dbaj o ich bezpieczeństwo. Mów w języku polsk
             } catch (error) {
                 console.error(error);
                 removeTypingIndicator();
-                appendMessage("Błąd połączenia satelitarnego (API). Sprawdź połączenie i spróbuj ponownie.", false);
+                appendMessage("⚠️ Błąd sieci. Przeglądarka zablokowała żądanie lub testujesz ze starej pamięci podręcznej (zrób twarde odświeżenie: Cmd+Shift+R).", false);
             } finally {
                 inputField.disabled = false;
                 sendBtn.disabled = false;
