@@ -1,112 +1,455 @@
 <!DOCTYPE html>
-<html lang="pl">
+<html lang="pl" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projekt Rysy - Panel Wyprawy</title>
+    <title>Projekt Rysy - Pełny Raport Operacyjny</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Styl dla customowych pasków postępu TOPR */
+        .progress-bar-bg { background-color: #334155; height: 8px; border-radius: 4px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; transition: width 1s ease-in-out; }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-200">
+<body class="bg-slate-900 text-slate-300 antialiased selection:bg-emerald-500/30">
 
-    <header class="relative bg-slate-950 py-16 px-6 border-b border-slate-800 text-center">
-        <div class="max-w-5xl mx-auto">
+    <!-- Hero Section -->
+    <header class="relative bg-slate-950 pt-20 pb-16 px-6 border-b border-slate-800 text-center overflow-hidden">
+        <!-- Tło z subtelną siatką -->
+        <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <path d="M0 40L40 0H20L0 20M40 40V20L20 40" stroke="currentColor" stroke-width="1" class="text-emerald-500" fill="none" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#grid)" />
+            </svg>
+        </div>
+
+        <div class="relative max-w-5xl mx-auto z-10">
             <div class="inline-flex items-center p-2 bg-emerald-500/10 text-emerald-400 rounded-full mb-6 ring-1 ring-emerald-500/20 text-xs uppercase tracking-widest font-bold">
                 <i data-lucide="mountain" class="w-4 h-4 mr-2"></i> Operacja: Sierpień 2026
             </div>
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6">Projekt <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Rysy</span></h1>
-            <p class="text-lg text-slate-400 max-w-2xl mx-auto font-light">Eksperckie kompendium dla ekipy Łukasza. Przygotuj się mądrze na najwyższy szczyt Polski.</p>
+            <h1 class="text-5xl md:text-7xl font-extrabold text-white mb-6 tracking-tight">Projekt <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">Rysy</span></h1>
+            <p class="text-lg md:text-xl text-slate-400 max-w-3xl mx-auto font-light leading-relaxed">
+                Ekspercki raport analityczny: Uwarunkowania techniczne, profilaktyka zagrożeń oraz metodyka przygotowań do letniej eksploracji szczytu Rysy (2499 m n.p.m.) w warunkach wzmożonego ruchu turystycznego.
+            </p>
         </div>
     </header>
 
-    <main class="max-w-4xl mx-auto p-6 py-12 space-y-12">
+    <!-- Nawigacja -->
+    <nav class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4">
+        <div class="max-w-5xl mx-auto flex overflow-x-auto hide-scrollbar text-sm md:text-base">
+            <a href="#wprowadzenie" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="info" class="w-4 h-4 mr-2"></i> Kontekst</a>
+            <a href="#trasa" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="map" class="w-4 h-4 mr-2"></i> Trasa</a>
+            <a href="#zagrozenia" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="alert-triangle" class="w-4 h-4 mr-2"></i> Zagrożenia</a>
+            <a href="#trening" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="dumbbell" class="w-4 h-4 mr-2"></i> Trening</a>
+            <a href="#ekwipunek" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="backpack" class="w-4 h-4 mr-2"></i> Ekwipunek</a>
+            <a href="#harmonogram" class="flex items-center whitespace-nowrap px-4 py-4 font-medium text-slate-400 hover:text-emerald-400 transition-colors border-b-2 border-transparent hover:border-emerald-400"><i data-lucide="clock" class="w-4 h-4 mr-2"></i> Harmonogram</a>
+        </div>
+    </nav>
+
+    <!-- Główna zawartość -->
+    <main class="max-w-5xl mx-auto p-6 py-12 space-y-24">
         
-        <section>
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <i data-lucide="map" class="text-emerald-400"></i> Logistyka Trasy
-            </h2>
-            <div class="grid md:grid-cols-2 gap-4 text-sm">
-                <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700">
-                    <h3 class="font-bold text-emerald-400 mb-2 underline">Asfalt (Palenica - Morskie Oko)</h3>
-                    <p>9 km rozgrzewki. Kluczowe: oszczędzaj siły, nie pędź. To tutaj najłatwiej "przepalić" nogi przed właściwym podejściem.</p>
-                </div>
-                <div class="bg-slate-800/50 p-5 rounded-xl border border-slate-700">
-                    <h3 class="font-bold text-emerald-400 mb-2 underline">Strefa Łańcuchów (od 2200m)</h3>
-                    <p>Wymaga skupienia i braku lęku wysokości. W sierpniu spodziewaj się zatorów – cierpliwość to Twój najważniejszy sprzęt.</p>
+        <!-- SEKCJA: Wprowadzenie -->
+        <section id="wprowadzenie" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-emerald-500/10 rounded-lg"><i data-lucide="info" class="w-6 h-6 text-emerald-400"></i></div>
+                <h2 class="text-3xl font-bold text-white">Wprowadzenie i Kontekst Topograficzny</h2>
+            </div>
+            
+            <div class="bg-slate-800/40 p-6 md:p-8 rounded-2xl border border-slate-700/50 leading-relaxed space-y-6 text-slate-300">
+                <p>
+                    Masyw Rysów, wznoszący się na wysokość <strong>2499 m n.p.m.</strong> (po stronie polskiej) oraz 2500 m n.p.m. (najwyższy, słowacki wierzchołek), stanowi absolutną kulminację topograficzną Polski. Ze względu na swój ikoniczny status, góra ta przyciąga w sezonie letnim dziesiątki tysięcy osób o skrajnie zróżnicowanym poziomie przygotowania.
+                </p>
+                <div class="grid md:grid-cols-2 gap-6 mt-6">
+                    <div class="bg-slate-900/50 p-5 rounded-xl border border-slate-700">
+                        <h3 class="text-lg font-bold text-blue-400 mb-2 flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-2"></i> Wariant Słowacki (Od południa)</h3>
+                        <p class="text-sm">Poprowadzony od Popradzkiego Stawu przez Dolinę Mięguszowiecką. Uchodzi za technicznie umiarkowany. Wymaga ok. 6 godzin marszu na dystansie blisko 20 km bez konieczności używania sprzętu wspinaczkowego.</p>
+                    </div>
+                    <div class="bg-emerald-900/20 p-5 rounded-xl border border-emerald-500/30">
+                        <h3 class="text-lg font-bold text-emerald-400 mb-2 flex items-center"><i data-lucide="mountain" class="w-4 h-4 mr-2"></i> Wariant Polski (Nasz cel)</h3>
+                        <p class="text-sm">Rozpoczyna się na Palenicy Białczańskiej. To monumentalne wyzwanie wydolnościowe: <strong>ponad 25 km dystansu i blisko 1900 metrów sumy podejść</strong>. Profil trasy jest asymetryczny, a trudności rosną z każdym metrem, kumulując się w wybitnie eksponowanym końcowym odcinku, naszpikowanym łańcuchami.</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="bg-slate-800/30 p-8 rounded-2xl border border-slate-700">
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <i data-lucide="backpack" class="text-emerald-400"></i> Checklista Sprzętowa
-            </h2>
-            <div id="checklist" class="grid md:grid-cols-2 gap-3">
+        <!-- SEKCJA: Trasa -->
+        <section id="trasa" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-blue-500/10 rounded-lg"><i data-lucide="map" class="w-6 h-6 text-blue-400"></i></div>
+                <h2 class="text-3xl font-bold text-white">Analiza Odcinków Trasy</h2>
+            </div>
+
+            <div class="space-y-6">
+                <div class="flex flex-col md:flex-row gap-6 bg-slate-800/40 p-6 rounded-2xl border border-slate-700/50">
+                    <div class="md:w-1/4">
+                        <span class="inline-block px-3 py-1 bg-slate-700 rounded text-xs font-bold uppercase tracking-wider mb-2">Etap 1</span>
+                        <h3 class="text-xl font-bold text-white">Asfalt</h3>
+                        <p class="text-sm text-slate-400 mt-1">Palenica Białczańska - Włosienica (9 km)</p>
+                    </div>
+                    <div class="md:w-3/4 text-sm text-slate-300">
+                        <p>Pozornie łatwa droga, która potrafi zgubić nieostrożnych. Monotonna, twarda nawierzchnia mocno obciąża stawy skokowe i kolanowe jeszcze przed właściwym wejściem. <strong>Taktyka:</strong> Traktuj to jako rozgrzewkę tlenową. Nie ścigaj się z czasem, aby uniknąć wczesnego zakwaszenia mięśni. Wychodzimy stąd w nocy, w chłodzie.</p>
+                    </div>
                 </div>
+
+                <div class="flex flex-col md:flex-row gap-6 bg-slate-800/40 p-6 rounded-2xl border border-slate-700/50">
+                    <div class="md:w-1/4">
+                        <span class="inline-block px-3 py-1 bg-slate-700 rounded text-xs font-bold uppercase tracking-wider mb-2">Etap 2</span>
+                        <h3 class="text-xl font-bold text-white">Granitowe Schody</h3>
+                        <p class="text-sm text-slate-400 mt-1">Morskie Oko - Czarny Staw - Bula pod Rysami</p>
+                    </div>
+                    <div class="md:w-3/4 text-sm text-slate-300">
+                        <p>Tutaj zaczyna się praca właściwa. Strome podejście po skalnych blokach wymaga głębokiej pracy ud i pośladków. Tętno gwałtownie rośnie. <strong>Uwaga krytyczna:</strong> W zacienionym żlebie pod Bulą (Rysa) bardzo często zalegają zlodowaciałe płaty śniegu – nawet w upalnym sierpniu! Upadek tutaj grozi niekontrolowanym zjazdem na kamienie. Tu przygotowujemy sprzęt twardy.</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-col md:flex-row gap-6 bg-slate-800/40 p-6 rounded-2xl border border-red-900/30 relative overflow-hidden">
+                    <div class="absolute right-0 top-0 w-16 h-full bg-red-500/5"></div>
+                    <div class="md:w-1/4 relative z-10">
+                        <span class="inline-block px-3 py-1 bg-red-900/50 text-red-300 border border-red-800 rounded text-xs font-bold uppercase tracking-wider mb-2">Etap 3 (Kluczowy)</span>
+                        <h3 class="text-xl font-bold text-white">Strefa Łańcuchów</h3>
+                        <p class="text-sm text-slate-400 mt-1">Od 2200 m n.p.m. do Szczytu</p>
+                    </div>
+                    <div class="md:w-3/4 text-sm text-slate-300 relative z-10">
+                        <p>Wchodzimy w strefę wysokogórską. Zaczynają się wyślizgane przez dziesiątki tysięcy butów płyty granitowe i ogromna ekspozycja (przepaście). Przełączka pod szczytem wymaga absolutnego braku lęku wysokości. Łańcuchy wymuszają mocną pracę obręczy barkowej i ramion. To tutaj kumulują się zatory turystyczne (mijanki), potęgując stres i zmęczenie.</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
-        <section>
-            <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <i data-lucide="clock" class="text-emerald-400"></i> Harmonogram Ataku
-            </h2>
-            <div class="border-l-2 border-emerald-500/30 ml-3 space-y-8">
-                <div class="relative pl-8">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 bg-emerald-500 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                    <span class="text-emerald-400 font-mono font-bold">03:30</span>
-                    <h4 class="font-bold text-white">Start z Palenicy</h4>
-                    <p class="text-slate-400 text-sm">Czołówki na głowy. Wyprzedzamy tłumy i upał.</p>
+        <!-- SEKCJA: Zagrożenia -->
+        <section id="zagrozenia" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-red-500/10 rounded-lg"><i data-lucide="alert-triangle" class="w-6 h-6 text-red-500"></i></div>
+                <h2 class="text-3xl font-bold text-white">Zagrożenia i Statystyki TOPR</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8">
+                <!-- Lewa kolumna: Zjawiska -->
+                <div class="space-y-6">
+                    <div class="bg-red-950/20 border border-red-900/50 p-6 rounded-2xl">
+                        <h3 class="text-xl font-bold text-red-400 flex items-center mb-3">
+                            <i data-lucide="cloud-lightning" class="w-6 h-6 mr-2"></i> Burze Konwekcyjne (Termiczne)
+                        </h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            W sierpniu najczęściej uderzają nagle między <strong>12:00 a 17:00</strong>. Kopuła szczytowa i setki metrów stalowych łańcuchów asekuracyjnych działają jak gigantyczne piorunochrony. Ucieczka w dół podczas burzy jest niemożliwa przez zatory na szlaku. <strong>Reguła 10 sekund:</strong> jeśli czas między błyskiem a grzmotem jest krótszy niż 10s, burza jest w krytycznej strefie rażenia.
+                        </p>
+                    </div>
+
+                    <div class="bg-orange-950/20 border border-orange-900/50 p-6 rounded-2xl">
+                        <h3 class="text-xl font-bold text-orange-400 flex items-center mb-3">
+                            <i data-lucide="users" class="w-6 h-6 mr-2"></i> Overcrowding i Lawiny Kamienne
+                        </h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            Apogeum sezonu to patologia tłumów. Powstają zatory, owczy pęd, który zagłusza rozsądek. Największym fizycznym zagrożeniem nie są usterki sprzętu, ale <strong>kamienie zrzucane przez nieuważnych turystów idących powyżej</strong>. Rozpędzony odłamek granitu wielkości pięści ma siłę pocisku. Kask to bezwzględny wymóg!
+                        </p>
+                    </div>
                 </div>
-                <div class="relative pl-8">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 bg-slate-600 rounded-full"></div>
-                    <span class="text-emerald-400 font-mono font-bold">08:00</span>
-                    <h4 class="font-bold text-white">Bula pod Rysami</h4>
-                    <p class="text-slate-400 text-sm">Decydujący moment. Sprawdzamy niebo pod kątem burz.</p>
+
+                <!-- Prawa kolumna: Statystyki TOPR -->
+                <div class="bg-slate-800/40 border border-slate-700/50 p-6 rounded-2xl flex flex-col justify-center">
+                    <h3 class="text-xl font-bold text-white mb-2">Główne przyczyny interwencji TOPR</h3>
+                    <p class="text-xs text-slate-400 mb-6 pb-4 border-b border-slate-700">Dane statystyczne, rejon Morskiego Oka i Rysów</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="font-bold text-rose-400">Potknięcia (Głównie podczas ZEJŚCIA!)</span>
+                                <span class="text-xl font-black text-white">Główne</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill bg-rose-500" style="width: 85%"></div></div>
+                            <p class="text-xs text-slate-400 mt-2"><strong>Dlaczego?</strong> Podczas zejścia mięśnie pracują ekscentrycznie (rozciągają się pod napięciem), co prowadzi do drżenia i mikrourazów. Zmęczony układ nerwowy ignoruje potknięcia. Śliski granit dopełnia dzieła.</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="font-bold text-yellow-400">Nagłe Zachorowania</span>
+                                <span class="text-xl font-black text-white">Częste</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill bg-yellow-500" style="width: 45%"></div></div>
+                            <p class="text-xs text-slate-400 mt-2">Wyczerpanie, udary słoneczne na patelni pod szczytem oraz <strong>krytyczne odwodnienie</strong> i utrata elektrolitów.</p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="font-bold text-blue-400">Brak umiejętności i blokady</span>
+                                <span class="text-xl font-black text-white">Zauważalne</span>
+                            </div>
+                            <div class="progress-bar-bg"><div class="progress-bar-fill bg-blue-500" style="width: 25%"></div></div>
+                            <p class="text-xs text-slate-400 mt-2">Paraliżujący lęk wysokości na Przełączce pod Rysami, uniemożliwiający ruch w jakimkolwiek kierunku.</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="relative pl-8">
-                    <div class="absolute -left-[9px] top-1 w-4 h-4 bg-emerald-500 rounded-full"></div>
-                    <span class="text-emerald-400 font-mono font-bold">10:30</span>
-                    <h4 class="font-bold text-white">SZCZYT</h4>
-                    <p class="text-slate-400 text-sm">Gratulacje! Krótki odpoczynek i szybka ucieczka przed "godziną burz".</p>
+            </div>
+        </section>
+
+        <!-- SEKCJA: Trening -->
+        <section id="trening" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-emerald-500/10 rounded-lg"><i data-lucide="dumbbell" class="w-6 h-6 text-emerald-400"></i></div>
+                <h2 class="text-3xl font-bold text-white">8-Tygodniowa Metodyka Przygotowań</h2>
+            </div>
+            
+            <p class="text-slate-300 mb-8 max-w-3xl">
+                Szlak na Rysy testuje przede wszystkim stawy biodrowe, kolanowe i wytrzymałość siłową nóg. Zwykłe bieganie po płaskim nie przygotuje aparatu ruchu do wejścia. Musimy symulować stromiznę i przyzwyczaić plecy do noszenia obciążenia.
+            </p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Tydzień 1-3 -->
+                <div class="bg-slate-800/40 border border-slate-700/50 p-5 rounded-xl relative overflow-hidden group hover:border-blue-500/50 transition-colors">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                    <h3 class="text-lg font-bold text-white mb-1">Tygodnie 1-3</h3>
+                    <p class="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-4">Budowa Bazy i Siły</p>
+                    <ul class="text-sm text-slate-300 space-y-2 list-disc list-outside ml-4">
+                        <li><strong>Kardio tlenowe (3x tyg):</strong> 45-60 min bieżni o nachyleniu 10-15%. Chodzimy, nie biegamy.</li>
+                        <li><strong>Siła (2x tyg):</strong> Przysiady bułgarskie (izolacja pośladków), wchodzenie na skrzynię z hantlami (Step-ups).</li>
+                        <li><strong>Prewencja:</strong> Monster walks z gumą (aktywacja).</li>
+                    </ul>
+                </div>
+
+                <!-- Tydzień 4-6 -->
+                <div class="bg-slate-800/40 border border-slate-700/50 p-5 rounded-xl relative overflow-hidden group hover:border-orange-500/50 transition-colors">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-orange-500"></div>
+                    <h3 class="text-lg font-bold text-white mb-1">Tygodnie 4-6</h3>
+                    <p class="text-xs font-semibold text-orange-400 uppercase tracking-wider mb-4">Adaptacja do Stromizny</p>
+                    <ul class="text-sm text-slate-300 space-y-2 list-disc list-outside ml-4">
+                        <li><strong>StairMaster:</strong> Maszyna schodów minimum 40 minut z docelowym plecakiem dociążonym do 5-8 kg.</li>
+                        <li><strong>Poligon Beskid Niski!</strong> W weekendy przenosimy się w teren. Obowiązkowe cele testowe to <strong class="text-orange-300">Lackowa (997m)</strong> ze słynną "Ścianą Płaczu" oraz strome <strong class="text-orange-300">Kozie Żebro (847m)</strong>. Kilkukrotne powtórzenia na tych ścianach symulują tatrzański pion!</li>
+                    </ul>
+                </div>
+
+                <!-- Tydzień 7 -->
+                <div class="bg-slate-800/40 border border-slate-700/50 p-5 rounded-xl relative overflow-hidden group hover:border-red-500/50 transition-colors">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+                    <h3 class="text-lg font-bold text-white mb-1">Tydzień 7</h3>
+                    <p class="text-xs font-semibold text-red-400 uppercase tracking-wider mb-4">Symulacja Generalna</p>
+                    <p class="text-sm text-slate-300">
+                        Czas na ostateczny sprawdzian wytrzymałości (tzw. wyrypa). Całodniowa, wielogodzinna wędrówka na dystansie około 25-30 km z przewyższeniem rzędu 1500 metrów. Pełny test całego sprzętu operacyjnego z checklisty: testujemy buty pod kątem otarć, ułożenie plecaka i strategię żywieniową (nawadnianie).
+                    </p>
+                </div>
+
+                <!-- Tydzień 8 -->
+                <div class="bg-slate-800/40 border border-slate-700/50 p-5 rounded-xl relative overflow-hidden group hover:border-emerald-500/50 transition-colors">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-emerald-500"></div>
+                    <h3 class="text-lg font-bold text-white mb-1">Tydzień 8</h3>
+                    <p class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-4">Tapering (Regeneracja)</p>
+                    <p class="text-sm text-slate-300">
+                        Drastyczna redukcja obciążeń treningowych. W tym tygodniu tylko spacery, dużo snu, intensywne rolowanie powięzi i mięśni oraz ładowanie węglowodanów w celu odbudowy zasobów glikogenu. Na szlak w Palenicy musisz wejść z całkowicie wypoczętym i spragnionym wysiłku układem nerwowym.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: Ekwipunek -->
+        <section id="ekwipunek" class="scroll-mt-24">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-indigo-500/10 rounded-lg"><i data-lucide="backpack" class="w-6 h-6 text-indigo-400"></i></div>
+                <h2 class="text-3xl font-bold text-white">Checklista Wyposażenia Operacyjnego</h2>
+            </div>
+
+            <div class="bg-slate-800/20 border border-slate-700/50 p-6 md:p-8 rounded-2xl">
+                <!-- Pasek postępu dla checklisty generowany w JS -->
+                <div class="flex justify-between items-end mb-3">
+                    <span class="text-sm font-semibold text-slate-400 uppercase">Gotowość Operacyjna</span>
+                    <span id="progress-text" class="text-2xl font-black text-emerald-400">0%</span>
+                </div>
+                <div class="progress-bar-bg mb-8">
+                    <div id="progress-bar" class="progress-bar-fill bg-emerald-500" style="width: 0%"></div>
+                </div>
+
+                <!-- Kontener na itemy z JS -->
+                <div id="checklist-container" class="grid md:grid-cols-2 gap-4"></div>
+            </div>
+        </section>
+
+        <!-- SEKCJA: Harmonogram -->
+        <section id="harmonogram" class="scroll-mt-24 pb-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="p-3 bg-cyan-500/10 rounded-lg"><i data-lucide="clock" class="w-6 h-6 text-cyan-400"></i></div>
+                <h2 class="text-3xl font-bold text-white">Taktyczny Harmonogram Ataku Szczytowego</h2>
+            </div>
+
+            <div class="bg-blue-900/10 border border-blue-900/50 p-5 rounded-xl mb-10 text-sm text-slate-300 flex items-start gap-4">
+                <i data-lucide="info" class="w-8 h-8 text-blue-400 shrink-0 mt-1"></i>
+                <p>
+                    <strong>Taktyka okna czasowego:</strong> Podstawą sukcesu i bezpieczeństwa w sierpniu jest przesunięcie startu na głęboką noc. Kto wyrusza o 8:00, staje w potężnych korkach na łańcuchach, a szczyt osiąga dokładnie w godzinach szczytowego ryzyka burzowego (13:00-15:00). Pamiętaj o wykupieniu E-Biletu TPN na parking z wyprzedzeniem!
+                </p>
+            </div>
+
+            <div class="max-w-3xl mx-auto border-l-2 border-slate-700 ml-4 md:ml-8 space-y-12">
+                <!-- Krok 1 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-emerald-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">03:30</span>
+                        <h4 class="text-xl font-bold text-white">Start: Palenica Białczańska (984 m)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Otwarcia szlabanów TPN. Odpalamy czołówki. Marsz asfalto-podobną nawierzchnią w chłodzie nocy pozwala oszczędzić płyny i uniknąć przegrzania organizmu.</p>
+                </div>
+                <!-- Krok 2 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-slate-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">05:15</span>
+                        <h4 class="text-xl font-bold text-white">Morskie Oko (1406 m)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Świt. Krótki postój przy schronisku na uzupełnienie kalorii (węglowodany proste) przed wejściem na strome, granitowe schody otaczające staw.</p>
+                </div>
+                <!-- Krok 3 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-slate-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">06:15</span>
+                        <h4 class="text-xl font-bold text-white">Czarny Staw pod Rysami (1583 m)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Koniec "turystyki spacerowej". Od tego momentu bezwzględnie <strong>zakładamy kaski wspinaczkowe</strong> na głowy – nad nami znajdują się już inni turyści i luźne kamienie.</p>
+                </div>
+                <!-- Krok 4 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-orange-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">08:00</span>
+                        <h4 class="text-xl font-bold text-white">Bula pod Rysami (2054 m) - Punkt Decyzyjny</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Miejsce odpoczynku przed wejściem w łańcuchy. To tutaj oceniamy ostatecznie warunki meteorologiczne (chmury Cumulonimbus) i kondycję grupy. Zakładamy rękawice ferratowe. Używamy raczków, jeśli w Rysie zalega stary śnieg.</p>
+                </div>
+                <!-- Krok 5 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-red-500 rounded-full shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">08:45 – 10:30</span>
+                        <h4 class="text-xl font-bold text-white">Atak: Strefa Łańcuchów i Przełączka</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Zachowujemy zasadę 3 punktów podparcia. Wymagane maksymalne skupienie, komunikacja z wymijającymi turystami i zimna krew. Przechodzimy eksponowaną przełączkę.</p>
+                </div>
+                <!-- Krok 6 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-emerald-500 border-4 border-emerald-200 rounded-full shadow-[0_0_20px_rgba(16,185,129,0.8)]"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">10:30</span>
+                        <h4 class="text-xl font-bold text-white">SZCZYT - Rysy (2499 m)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Dach Polski zdobyty! Szybka regeneracja, zdjęcia, uzupełnienie kalorii. Nie zwlekamy zbyt długo, z dołu napierają kolejne grupy turystów.</p>
+                </div>
+                <!-- Krok 7 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-red-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">11:00</span>
+                        <h4 class="text-xl font-bold text-white">Rozpoczęcie Zejścia</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Statystycznie najbardziej niebezpieczny etap wyrypy. Najwyższa uwaga na śliskich płytach, ostrożne opuszczanie się na łańcuchach, przepuszczanie wchodzących.</p>
+                </div>
+                <!-- Krok 8 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-slate-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">14:30</span>
+                        <h4 class="text-xl font-bold text-white">Morskie Oko - Strefa Bezpieczna</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Prawdopodobny czas uderzenia popołudniowych burz. Ekipa operacyjna jest już bezpieczna na poziomie schroniska, ładując kalorie.</p>
+                </div>
+                <!-- Krok 9 -->
+                <div class="relative pl-8 md:pl-10">
+                    <div class="absolute -left-[11px] top-1 w-5 h-5 bg-slate-900 border-4 border-emerald-500 rounded-full"></div>
+                    <div class="flex flex-col md:flex-row md:items-baseline gap-2 mb-2">
+                        <span class="font-mono text-emerald-400 font-bold text-xl">16:30</span>
+                        <h4 class="text-xl font-bold text-white">Palenica Białczańska (Zakończenie)</h4>
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed">Całkowity czas akcji górskiej: 12-13 godzin. Koniec operacji.</p>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <footer class="py-12 text-center text-slate-500 text-xs border-t border-slate-800">
-        Przygotowane przez Kai dla Łukasza & Ekipy
+    <footer class="py-8 text-center text-slate-600 text-sm border-t border-slate-800">
+        Panel operacyjny zaprojektowany na podstawie założeń eksperckich.
     </footer>
 
+    <!-- Logika Checklisty -->
     <script>
-        // Inicjalizacja ikon Lucide
         lucide.createIcons();
 
-        // Prosta logika checklisty
-        const items = [
-            { t: "Kask wspinaczkowy", c: true },
-            { t: "Buty podejściowe (Vibram)", c: true },
-            { t: "Woda (min. 3 litry)", c: true },
-            { t: "Rękawiczki na łańcuchy", c: false },
-            { t: "Kurtka hardshell/membrana", c: false },
-            { t: "Czołówka + baterie", c: false }
+        const eqItems = [
+            { id: 'kask', title: 'Kask Wspinaczkowy (UIAA)', desc: 'Chroni głowę przed kamieniami zrzucanymi z góry przez innych. Bezwzględny obowiązek.', critical: true },
+            { id: 'buty', title: 'Buty Podejściowe (Vibram)', desc: 'Półsztywne, z trefą "climbing zone" na przodzie. Zwykłe adidasy to ryzyko utraty życia na wilgotnych, śliskich płytach.', critical: true },
+            { id: 'woda', title: 'Nawodnienie (3-4 litry/os.)', desc: 'Woda, izotoniki, elektrolity. Wyżej nie ma dostępu do strumieni, a odwodnienie niszczy koncentrację.', critical: true },
+            { id: 'rekawice', title: 'Rękawice (Ferratowe/Rowerowe)', desc: 'Stalowe łańcuchy niszczą dłonie, powodują pęcherze i ból po 2 godzinach wciągania się.', critical: false },
+            { id: 'hardshell', title: 'Odzież Membranowa & Merino', desc: 'Zero bawełny! Ochrona przed lodowatym wiatrem na grani w trakcie zatorów (oczekiwania w miejscu).', critical: false },
+            { id: 'raczki', title: 'Raczki Turystyczne', desc: 'Narzędzie awaryjne. Niezbędne do przejścia zlodowaciałego żlebu (Rysy) pod Bulą z samego rana.', critical: false },
+            { id: 'czolowka', title: 'Czołówka (min. 300lm)', desc: 'Nocne wyjście z Palenicy bez światła jest niemożliwe. Pamiętaj o zapasowych bateriach.', critical: true },
+            { id: 'apteczka', title: 'Apteczka Taktyczna', desc: 'Koc NRC (folia życia), mocne leki przeciwbólowe, plastry na otarcia od butów i staza na skręcenia.', critical: false }
         ];
 
-        const listDiv = document.getElementById('checklist');
-        items.forEach(item => {
+        let checkedState = {};
+        eqItems.forEach(item => checkedState[item.id] = false);
+
+        const container = document.getElementById('checklist-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+
+        function updateProgress() {
+            const total = eqItems.length;
+            const checkedCount = Object.values(checkedState).filter(Boolean).length;
+            const percentage = Math.round((checkedCount / total) * 100);
+            
+            progressBar.style.width = percentage + '%';
+            progressText.innerText = percentage + '%';
+        }
+
+        function toggleItem(id, el) {
+            checkedState[id] = !checkedState[id];
+            
+            if(checkedState[id]) {
+                el.classList.add('bg-emerald-900/30', 'border-emerald-500/50');
+                el.classList.remove('bg-slate-800/40', 'border-slate-700/50');
+                el.querySelector('.check-circle').classList.add('bg-emerald-500', 'border-emerald-500', 'text-white');
+                el.querySelector('.check-circle').classList.remove('border-slate-600');
+                el.querySelector('.check-icon').classList.remove('hidden');
+                el.querySelector('h4').classList.add('text-emerald-400');
+            } else {
+                el.classList.remove('bg-emerald-900/30', 'border-emerald-500/50');
+                el.classList.add('bg-slate-800/40', 'border-slate-700/50');
+                el.querySelector('.check-circle').classList.remove('bg-emerald-500', 'border-emerald-500', 'text-white');
+                el.querySelector('.check-circle').classList.add('border-slate-600');
+                el.querySelector('.check-icon').classList.add('hidden');
+                el.querySelector('h4').classList.remove('text-emerald-400');
+            }
+            updateProgress();
+        }
+
+        eqItems.forEach(item => {
             const div = document.createElement('div');
-            div.className = "flex items-center gap-3 p-3 bg-slate-900/50 rounded-lg border border-slate-700 cursor-pointer hover:bg-slate-700/50 transition-all";
+            div.className = "cursor-pointer p-4 rounded-xl border border-slate-700/50 bg-slate-800/40 transition-all duration-300 flex items-start gap-4 hover:border-slate-500/50";
+            div.onclick = () => toggleItem(item.id, div);
+            
+            const criticalBadge = item.critical ? `<span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded uppercase tracking-wider ml-2 inline-block relative -top-0.5 border border-red-500/20">Wymóg TPN</span>` : '';
+
             div.innerHTML = `
-                <input type="checkbox" class="w-4 h-4 accent-emerald-500">
-                <span class="text-sm ${item.c ? 'font-bold' : ''}">${item.t} ${item.c ? '⚠️' : ''}</span>
+                <div class="check-circle mt-0.5 w-6 h-6 rounded-full border-2 border-slate-600 flex items-center justify-center shrink-0 transition-colors">
+                    <i data-lucide="check" class="check-icon w-4 h-4 hidden"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-slate-200 transition-colors leading-tight">${item.title} ${criticalBadge}</h4>
+                    <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">${item.desc}</p>
+                </div>
             `;
-            listDiv.appendChild(div);
+            container.appendChild(div);
         });
+
+        // Reinicjalizacja ikon dla nowo wygenerowanych elementów
+        lucide.createIcons();
     </script>
 </body>
 </html>
