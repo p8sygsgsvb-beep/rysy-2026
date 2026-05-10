@@ -23,6 +23,20 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Animacje dla czatu */
+        .chat-bubble { animation: popIn 0.3s ease-out; }
+        @keyframes popIn {
+            0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .typing-dot { animation: typing 1.4s infinite ease-in-out both; }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-300 antialiased selection:bg-emerald-500/30">
@@ -393,12 +407,59 @@
 
     </main>
 
+    <!-- Asystent AI (Czat) UI -->
+    <div id="ai-chat-container" class="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+        
+        <!-- Okno Czatu -->
+        <div id="ai-chat-window" class="pointer-events-auto bg-slate-800 border border-slate-700 rounded-2xl shadow-2xl w-80 md:w-96 mb-4 overflow-hidden flex flex-col transition-all duration-300 transform origin-bottom-right scale-0 opacity-0 h-[450px]">
+            <!-- Nagłówek czatu -->
+            <div class="bg-slate-900 border-b border-slate-700 p-4 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                    <h3 class="font-bold text-slate-200">Asystent Wyprawy (AI)</h3>
+                </div>
+                <button id="close-chat" class="text-slate-400 hover:text-white transition">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <!-- Wiadomości -->
+            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm bg-slate-800/50">
+                <!-- Powitanie AI -->
+                <div class="flex flex-col items-start gap-1">
+                    <span class="text-xs text-slate-500 ml-1 font-semibold">System operacyjny</span>
+                    <div class="bg-slate-700 text-slate-200 px-4 py-2.5 rounded-2xl rounded-tl-sm chat-bubble shadow-sm">
+                        Cześć! Jestem Twoim wirtualnym doradcą ds. Rysów. Znam raport na pamięć. O co chcesz zapytać?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pole wprowadzania -->
+            <div class="p-3 bg-slate-900 border-t border-slate-700 flex gap-2 items-end">
+                <textarea id="chat-input" rows="1" class="flex-1 bg-slate-800 text-slate-200 border border-slate-700 rounded-xl px-3 py-2.5 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all resize-none text-sm" placeholder="Zapytaj np. o burze..."></textarea>
+                <button id="send-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white p-2.5 rounded-xl transition-colors shadow-md disabled:opacity-50">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Przycisk Otwierający (FAB) -->
+        <button id="toggle-chat" class="pointer-events-auto bg-emerald-600 hover:bg-emerald-500 text-white rounded-full p-4 shadow-lg shadow-emerald-900/50 transition-transform transform hover:scale-105 active:scale-95 flex items-center justify-center relative">
+            <i data-lucide="message-square-text" class="w-6 h-6"></i>
+            <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-slate-900"></span>
+            </span>
+        </button>
+    </div>
+
     <footer class="py-8 text-center text-slate-600 text-sm border-t border-slate-800">
         Panel operacyjny zaprojektowany na podstawie założeń eksperckich.
     </footer>
 
-    <!-- Logika Zakładek i Checklisty -->
+    <!-- Logika Główna i AI -->
     <script>
+        // Inicjalizacja ikon
         lucide.createIcons();
 
         // --- Logika Zakładek (Tabs) ---
@@ -407,22 +468,15 @@
 
         tabBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Usuń aktywne klasy ze wszystkich przycisków
                 tabBtns.forEach(b => {
                     b.classList.remove('text-emerald-400', 'border-emerald-400', 'active');
                     b.classList.add('text-slate-400', 'border-transparent');
                 });
-                
-                // Ukryj całą zawartość
-                tabContents.forEach(content => {
-                    content.classList.remove('active');
-                });
+                tabContents.forEach(content => content.classList.remove('active'));
 
-                // Dodaj aktywne klasy do klikniętego przycisku
                 btn.classList.add('text-emerald-400', 'border-emerald-400', 'active');
                 btn.classList.remove('text-slate-400', 'border-transparent');
 
-                // Pokaż odpowiednią zawartość
                 const targetId = btn.getAttribute('data-target');
                 document.getElementById(targetId).classList.add('active');
             });
@@ -430,15 +484,14 @@
 
         // --- Logika Checklisty ---
         const eqItems = [
-            { id: 'kask', title: 'Kask Wspinaczkowy (UIAA)', desc: 'Chroni głowę przed kamieniami zrzucanymi z góry przez innych. Bezwzględny obowiązek.', critical: true },
-            { id: 'buty', title: 'Buty Podejściowe (Vibram)', desc: 'Półsztywne, z trefą "climbing zone" na przodzie. Zwykłe adidasy to ryzyko utraty życia na wilgotnych, śliskich płytach.', critical: true },
-            { id: 'woda', title: 'Nawodnienie (3-4 litry/os.)', desc: 'Woda, izotoniki, elektrolity. Wyżej nie ma dostępu do strumieni, a odwodnienie niszczy koncentrację.', critical: true },
-            { id: 'jedzenie', title: 'Prowiant Wysokoenergetyczny', desc: 'Węgle złożone (kanapki pełnoziarniste na postój) i szybkie cukry (żele, batony, czekolada) do jedzenia w marszu.', critical: true },
-            { id: 'rekawice', title: 'Rękawice (Ferratowe/Rowerowe)', desc: 'Stalowe łańcuchy niszczą dłonie, powodują pęcherze i ból po 2 godzinach wciągania się.', critical: false },
-            { id: 'hardshell', title: 'Odzież Membranowa & Merino', desc: 'Zero bawełny! Ochrona przed lodowatym wiatrem na grani w trakcie zatorów (oczekiwania w miejscu).', critical: false },
-            { id: 'raczki', title: 'Raczki Turystyczne', desc: 'Narzędzie awaryjne. Niezbędne do przejścia zlodowaciałego żlebu (Rysy) pod Bulą z samego rana.', critical: false },
-            { id: 'czolowka', title: 'Czołówka (min. 300lm)', desc: 'Nocne wyjście z Palenicy bez światła jest niemożliwe. Pamiętaj o zapasowych bateriach.', critical: true },
-            { id: 'apteczka', title: 'Apteczka Taktyczna', desc: 'Koc NRC (folia życia), mocne leki przeciwbólowe, plastry na otarcia od butów i staza na skręcenia.', critical: false }
+            { id: 'kask', title: 'Kask Wspinaczkowy (UIAA)', desc: 'Chroni przed kamieniami.', critical: true },
+            { id: 'buty', title: 'Buty Podejściowe (Vibram)', desc: 'Półsztywne, na wilgotne płyty.', critical: true },
+            { id: 'woda', title: 'Nawodnienie (3-4 litry)', desc: 'Wyżej nie ma dostępu do wody.', critical: true },
+            { id: 'jedzenie', title: 'Prowiant Wysokoenergetyczny', desc: 'Węgle złożone (postoje) i proste (marsz).', critical: true },
+            { id: 'rekawice', title: 'Rękawice', desc: 'Ochrona przed łańcuchami.', critical: false },
+            { id: 'hardshell', title: 'Odzież Membranowa', desc: 'Ochrona przed lodowatym wiatrem.', critical: false },
+            { id: 'raczki', title: 'Raczki Turystyczne', desc: 'Awaryjnie na śnieg pod Bulą.', critical: false },
+            { id: 'czolowka', title: 'Czołówka', desc: 'Niezbędna do nocnego startu.', critical: true }
         ];
 
         let checkedState = {};
@@ -452,14 +505,12 @@
             const total = eqItems.length;
             const checkedCount = Object.values(checkedState).filter(Boolean).length;
             const percentage = Math.round((checkedCount / total) * 100);
-            
             progressBar.style.width = percentage + '%';
             progressText.innerText = percentage + '%';
         }
 
         function toggleItem(id, el) {
             checkedState[id] = !checkedState[id];
-            
             if(checkedState[id]) {
                 el.classList.add('bg-emerald-900/30', 'border-emerald-500/50');
                 el.classList.remove('bg-slate-800/40', 'border-slate-700/50');
@@ -482,9 +533,7 @@
             const div = document.createElement('div');
             div.className = "cursor-pointer p-4 rounded-xl border border-slate-700/50 bg-slate-800/40 transition-all duration-300 flex items-start gap-4 hover:border-slate-500/50";
             div.onclick = () => toggleItem(item.id, div);
-            
             const criticalBadge = item.critical ? `<span class="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded uppercase tracking-wider ml-2 inline-block relative -top-0.5 border border-red-500/20">Wymóg TPN</span>` : '';
-
             div.innerHTML = `
                 <div class="check-circle mt-0.5 w-6 h-6 rounded-full border-2 border-slate-600 flex items-center justify-center shrink-0 transition-colors">
                     <i data-lucide="check" class="check-icon w-4 h-4 hidden"></i>
@@ -497,7 +546,162 @@
             container.appendChild(div);
         });
 
-        // Reinicjalizacja ikon dla nowo wygenerowanych elementów
+        // --- Logika Czatbota (Gemini API) ---
+        const chatWindow = document.getElementById('ai-chat-window');
+        const toggleBtn = document.getElementById('toggle-chat');
+        const closeBtn = document.getElementById('close-chat');
+        const messagesContainer = document.getElementById('chat-messages');
+        const inputField = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        let isChatOpen = false;
+
+        // Baza wiedzy wstrzyknięta do promptu systemowego
+        const SYSTEM_PROMPT = `Jesteś ekspertem ds. logistyki górskiej i wirtualnym asystentem ekipy planującej wejście na Rysy (2499 m n.p.m.) ze strony polskiej w sierpniu 2026. 
+Odpowiadaj krótko, naturalnie i bezpośrednio na pytania użytkownika, opierając się TYLKO na poniższym raporcie operacyjnym:
+- Trasa: Start z Palenicy (asfalt 9 km). Potem strome schody do Morskiego Oka i Czarnego Stawu. Pod Bulą (ok. 2000m) śnieg możliwy w sierpniu (trzeba raczki). Od 2200m zaczynają się wyślizgane łańcuchy, strome płyty, przełączka i ogromna ekspozycja. Zejście jest najgroźniejsze (drżenie mięśni, potknięcia).
+- Harmonogram: Start z Palenicy o 03:30 w nocy! (by uniknąć zatorów i burz). 05:15 Morskie Oko, 06:15 Czarny Staw (zakładamy kaski), 08:00 Bula, 10:30 SZCZYT. O 14:30 powrót do MOka przed popołudniowymi burzami.
+- Trening (8 tyg): Tydz 1-3 to kardio z nachyleniem i przysiady. Tydz 4-6 to poligon w Beskidzie Niskim (góry: Lackowa - tzw. Ściana Płaczu, Kozie Żebro). Tydz 7 wyrypa testowa. Tydz 8 to tapering (odpoczynek, glikogen).
+- Zagrożenia: Burze termiczne (12:00-17:00, zasada 10 sekund miedzy błyskiem a grzmotem), sztuczne lawiny zrzucane przez turystów wyżej (dlatego KASK to obowiązek), potknięcia ze zmęczenia mięśni przy zejściu, odwodnienie.
+- Ekwipunek: Kask, buty z wibramem, 3-4L wody, izotoniki, węgle złożone (kanapki na postój) i proste (żele w marszu), rękawice, hardshell, czołówka.
+Bądź pomocny, profesjonalny i dbaj o ich bezpieczeństwo. Mów w języku polskim. Jeśli o coś zapytają spoza raportu (np. o inną górę), grzecznie nakieruj rozmowę na Rysy.`;
+
+        // Otwieranie / Zamykanie UI
+        function toggleChat() {
+            isChatOpen = !isChatOpen;
+            if(isChatOpen) {
+                chatWindow.classList.remove('scale-0', 'opacity-0');
+                chatWindow.classList.add('scale-100', 'opacity-100');
+                inputField.focus();
+            } else {
+                chatWindow.classList.add('scale-0', 'opacity-0');
+                chatWindow.classList.remove('scale-100', 'opacity-100');
+            }
+        }
+        toggleBtn.addEventListener('click', toggleChat);
+        closeBtn.addEventListener('click', toggleChat);
+
+        // Dopasowanie rozmiaru pola tekstowego
+        inputField.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight < 100 ? this.scrollHeight : 100) + 'px';
+        });
+
+        // Wciskanie Enter w polu tekstowym
+        inputField.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        sendBtn.addEventListener('click', sendMessage);
+
+        function appendMessage(text, isUser) {
+            const div = document.createElement('div');
+            div.className = `flex flex-col items-${isUser ? 'end' : 'start'} gap-1`;
+            
+            const sender = document.createElement('span');
+            sender.className = 'text-xs text-slate-500 mx-1 font-semibold';
+            sender.innerText = isUser ? 'Ty' : 'Asystent AI';
+            
+            const bubble = document.createElement('div');
+            bubble.className = `px-4 py-2.5 rounded-2xl text-slate-200 chat-bubble shadow-sm ${
+                isUser 
+                ? 'bg-emerald-600 rounded-tr-sm' 
+                : 'bg-slate-700 rounded-tl-sm'
+            }`;
+            bubble.innerText = text;
+            
+            div.appendChild(sender);
+            div.appendChild(bubble);
+            messagesContainer.appendChild(div);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function appendTypingIndicator() {
+            const div = document.createElement('div');
+            div.id = 'typing-indicator';
+            div.className = 'flex flex-col items-start gap-1';
+            div.innerHTML = `
+                <span class="text-xs text-slate-500 ml-1 font-semibold">Asystent AI</span>
+                <div class="bg-slate-700 px-4 py-3 rounded-2xl rounded-tl-sm chat-bubble flex items-center gap-1 shadow-sm">
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
+                    <div class="w-1.5 h-1.5 bg-slate-400 rounded-full typing-dot"></div>
+                </div>
+            `;
+            messagesContainer.appendChild(div);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        async function fetchWithBackoff(url, options, retries = 5) {
+            let delay = 1000;
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const res = await fetch(url, options);
+                    if (!res.ok) throw new Error(`Błąd HTTP: ${res.status}`);
+                    return await res.json();
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                }
+            }
+        }
+
+        async function sendMessage() {
+            const text = inputField.value.trim();
+            if (!text) return;
+
+            // Zablokuj input
+            inputField.value = '';
+            inputField.style.height = 'auto';
+            inputField.disabled = true;
+            sendBtn.disabled = true;
+
+            appendMessage(text, true);
+            appendTypingIndicator();
+
+            try {
+                const apiKey = ""; // Klucz wstrzykiwany przez środowisko operacyjne
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                const payload = {
+                    contents: [{ parts: [{ text: text }] }],
+                    systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] }
+                };
+
+                const data = await fetchWithBackoff(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                removeTypingIndicator();
+
+                const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (aiResponse) {
+                    appendMessage(aiResponse, false);
+                } else {
+                    appendMessage("Przepraszam, wystąpił problem z modułem komunikacyjnym. Spróbuj ponownie.", false);
+                }
+
+            } catch (error) {
+                console.error(error);
+                removeTypingIndicator();
+                appendMessage("Błąd połączenia satelitarnego (API). Sprawdź połączenie i spróbuj ponownie.", false);
+            } finally {
+                inputField.disabled = false;
+                sendBtn.disabled = false;
+                inputField.focus();
+            }
+        }
+
+        // Inicjalizacja ikon na sam koniec, by obsłużyły przyciski
         lucide.createIcons();
     </script>
 </body>
